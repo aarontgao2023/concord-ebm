@@ -10,5 +10,7 @@ First public version.
   effective sample size, resampling stability and paired p-difference diagnostics.
 - Estimators: `invariant_min` (default), `invariant_pooled`, `shared`, `standard`, `saebm` (optional).
 - Command-line entry point `concord`.
-- `concord.simulate`: the ADNI-shaped simulator used in the paper's validation (pre-registered cells).
+- Worker pool based on `concurrent.futures`: a worker that dies (e.g. an unguarded script re-imported by a
+  spawned process) raises a clear error instead of hanging.
+- Simulations, protocols and analyses are kept in the companion repository `concord-ebm-paper`.
 - Pinned to the unmodified `pyebm==2.0.3`; the package verifies the installed source before fitting.

@@ -1,0 +1,1067 @@
+{
+  "spec": {
+    "group_column": "group",
+    "group_values": [
+      0,
+      1,
+      2
+    ],
+    "labels": [
+      "CN",
+      "MCI",
+      "AD"
+    ],
+    "biomarkers": [
+      "marker0",
+      "marker1",
+      "marker2",
+      "marker3",
+      "marker4",
+      "marker5",
+      "marker6",
+      "marker7"
+    ],
+    "estimator": "invariant_min",
+    "consensus": "repaired",
+    "fast_likelihood": true,
+    "fit_timeout_s": 900,
+    "seed": 1,
+    "saebm_iterations": 2000,
+    "saebm_burn_in": 500,
+    "B": 59,
+    "schemes": [
+      "unrestricted",
+      "diagnosis",
+      "diagnosis_pair_0-1",
+      "diagnosis_pair_0-2",
+      "diagnosis_pair_1-2"
+    ],
+    "stability_resamples": 10
+  },
+  "groups": [
+    "0",
+    "1",
+    "2"
+  ],
+  "biomarkers": [
+    "marker0",
+    "marker1",
+    "marker2",
+    "marker3",
+    "marker4",
+    "marker5",
+    "marker6",
+    "marker7"
+  ],
+  "status": "ok",
+  "orderings": {
+    "0": [
+      "marker0",
+      "marker1",
+      "marker2",
+      "marker3",
+      "marker4",
+      "marker5",
+      "marker7",
+      "marker6"
+    ],
+    "1": [
+      "marker0",
+      "marker1",
+      "marker2",
+      "marker3",
+      "marker4",
+      "marker5",
+      "marker7",
+      "marker6"
+    ],
+    "2": [
+      "marker0",
+      "marker1",
+      "marker2",
+      "marker3",
+      "marker4",
+      "marker5",
+      "marker7",
+      "marker6"
+    ]
+  },
+  "positions": {
+    "marker0": {
+      "0": 0,
+      "1": 0,
+      "2": 0
+    },
+    "marker1": {
+      "0": 1,
+      "1": 1,
+      "2": 1
+    },
+    "marker2": {
+      "0": 2,
+      "1": 2,
+      "2": 2
+    },
+    "marker3": {
+      "0": 3,
+      "1": 3,
+      "2": 3
+    },
+    "marker4": {
+      "0": 4,
+      "1": 4,
+      "2": 4
+    },
+    "marker5": {
+      "0": 5,
+      "1": 5,
+      "2": 5
+    },
+    "marker6": {
+      "0": 7,
+      "1": 7,
+      "2": 7
+    },
+    "marker7": {
+      "0": 6,
+      "1": 6,
+      "2": 6
+    }
+  },
+  "distances": {
+    "pairs": {
+      "0-1": 0.0,
+      "0-2": 0.0,
+      "1-2": 0.0
+    },
+    "max": 0.0,
+    "max_pair": "0-1",
+    "statistic": "normalised Kendall tau distance"
+  },
+  "tests": {
+    "unrestricted": {
+      "definition": {
+        "stratify": "none",
+        "groups": [
+          0,
+          1,
+          2
+        ],
+        "pair_index": null
+      },
+      "budget": 59,
+      "completed": 59,
+      "failed": 0,
+      "pairs": {
+        "0-1": {
+          "exceedances": 59,
+          "p": 1.0,
+          "p_bounds": [
+            1.0,
+            1.0
+          ],
+          "reject": false,
+          "threshold": 0.016666666666666666
+        },
+        "0-2": {
+          "exceedances": 59,
+          "p": 1.0,
+          "p_bounds": [
+            1.0,
+            1.0
+          ],
+          "reject": false,
+          "threshold": 0.016666666666666666
+        },
+        "1-2": {
+          "exceedances": 59,
+          "p": 1.0,
+          "p_bounds": [
+            1.0,
+            1.0
+          ],
+          "reject": false,
+          "threshold": 0.016666666666666666
+        }
+      },
+      "max": {
+        "exceedances": 59,
+        "p": 1.0,
+        "p_bounds": [
+          1.0,
+          1.0
+        ],
+        "reject": false,
+        "threshold": 0.05
+      },
+      "seconds": 11.94903436792083
+    },
+    "diagnosis": {
+      "definition": {
+        "stratify": "diagnosis",
+        "groups": [
+          0,
+          1,
+          2
+        ],
+        "pair_index": null
+      },
+      "budget": 59,
+      "completed": 59,
+      "failed": 0,
+      "pairs": {
+        "0-1": {
+          "exceedances": 59,
+          "p": 1.0,
+          "p_bounds": [
+            1.0,
+            1.0
+          ],
+          "reject": false,
+          "threshold": 0.016666666666666666
+        },
+        "0-2": {
+          "exceedances": 59,
+          "p": 1.0,
+          "p_bounds": [
+            1.0,
+            1.0
+          ],
+          "reject": false,
+          "threshold": 0.016666666666666666
+        },
+        "1-2": {
+          "exceedances": 59,
+          "p": 1.0,
+          "p_bounds": [
+            1.0,
+            1.0
+          ],
+          "reject": false,
+          "threshold": 0.016666666666666666
+        }
+      },
+      "max": {
+        "exceedances": 59,
+        "p": 1.0,
+        "p_bounds": [
+          1.0,
+          1.0
+        ],
+        "reject": false,
+        "threshold": 0.05
+      },
+      "seconds": 11.540407624328509
+    },
+    "diagnosis_pair_0-1": {
+      "definition": {
+        "stratify": "diagnosis",
+        "groups": [
+          0,
+          1
+        ],
+        "pair_index": 0
+      },
+      "budget": 59,
+      "completed": 59,
+      "failed": 0,
+      "pairs": {
+        "0-1": {
+          "exceedances": 59,
+          "p": 1.0,
+          "p_bounds": [
+            1.0,
+            1.0
+          ],
+          "reject": false,
+          "threshold": 0.016666666666666666
+        }
+      },
+      "max": null,
+      "seconds": 10.618987708818167
+    },
+    "diagnosis_pair_0-2": {
+      "definition": {
+        "stratify": "diagnosis",
+        "groups": [
+          0,
+          2
+        ],
+        "pair_index": 1
+      },
+      "budget": 59,
+      "completed": 59,
+      "failed": 0,
+      "pairs": {
+        "0-2": {
+          "exceedances": 59,
+          "p": 1.0,
+          "p_bounds": [
+            1.0,
+            1.0
+          ],
+          "reject": false,
+          "threshold": 0.016666666666666666
+        }
+      },
+      "max": null,
+      "seconds": 10.458299627993256
+    },
+    "diagnosis_pair_1-2": {
+      "definition": {
+        "stratify": "diagnosis",
+        "groups": [
+          1,
+          2
+        ],
+        "pair_index": 2
+      },
+      "budget": 59,
+      "completed": 59,
+      "failed": 0,
+      "pairs": {
+        "1-2": {
+          "exceedances": 59,
+          "p": 1.0,
+          "p_bounds": [
+            1.0,
+            1.0
+          ],
+          "reject": false,
+          "threshold": 0.016666666666666666
+        }
+      },
+      "max": null,
+      "seconds": 10.25151291443035
+    }
+  },
+  "decisions": {
+    "rule": "le",
+    "alpha": 0.05,
+    "per_pair_threshold": 0.016666666666666666,
+    "convention": "p = (1 + #{perm stat >= observed}) / (B + 1); ties are exceedances; reject iff p <= threshold; decisions are exact over unfinished fits",
+    "primary": "diagnosis",
+    "localisation": "diagnosis_pair",
+    "global": "diagnosis:max",
+    "reject_any_pair": {
+      "unrestricted": false,
+      "diagnosis": false,
+      "diagnosis_pair_0-1": false,
+      "diagnosis_pair_0-2": false,
+      "diagnosis_pair_1-2": false
+    },
+    "stop_when_decided": false
+  },
+  "composition": {
+    "labels": [
+      "CN",
+      "MCI",
+      "AD"
+    ],
+    "counts": {
+      "0": {
+        "CN": 46,
+        "MCI": 14,
+        "AD": 20
+      },
+      "1": {
+        "CN": 98,
+        "MCI": 56,
+        "AD": 46
+      },
+      "2": {
+        "CN": 58,
+        "MCI": 65,
+        "AD": 97
+      }
+    },
+    "proportions": {
+      "0": {
+        "CN": 0.575,
+        "MCI": 0.175,
+        "AD": 0.25
+      },
+      "1": {
+        "CN": 0.49,
+        "MCI": 0.28,
+        "AD": 0.23
+      },
+      "2": {
+        "CN": 0.2636363636363636,
+        "MCI": 0.29545454545454547,
+        "AD": 0.4409090909090909
+      }
+    },
+    "pooled": {
+      "CN": 0.404,
+      "MCI": 0.27,
+      "AD": 0.326
+    },
+    "min_reference": {
+      "CN": 0.39428959891230453,
+      "MCI": 0.26172671651937457,
+      "AD": 0.3439836845683209
+    },
+    "chi2": 39.438715139407606,
+    "chi2_dof": 4,
+    "chi2_p": 5.654160160664615e-08,
+    "flags": []
+  },
+  "effective_sample_size": {
+    "0": 70.47804026855901,
+    "1": 185.80874895702058,
+    "2": 201.85213865269682
+  },
+  "stability": {
+    "resamples": 10,
+    "completed": 10,
+    "failed": 0,
+    "groups": {
+      "0": {
+        "mean_distance": 0.04642857142857142,
+        "sd_distance": 0.04141077888315735,
+        "position_sd": {
+          "marker0": 0.0,
+          "marker1": 0.42163702135578396,
+          "marker2": 0.42163702135578396,
+          "marker3": 0.5270462766947299,
+          "marker4": 0.9486832980505138,
+          "marker5": 0.4216370213557839,
+          "marker6": 0.31622776601683794,
+          "marker7": 0.8232726023485646
+        }
+      },
+      "1": {
+        "mean_distance": 0.04285714285714285,
+        "sd_distance": 0.047020042043170236,
+        "position_sd": {
+          "marker0": 0.0,
+          "marker1": 0.31622776601683794,
+          "marker2": 0.31622776601683794,
+          "marker3": 0.9660917830792959,
+          "marker4": 0.6324555320336759,
+          "marker5": 1.0540925533894598,
+          "marker6": 0.31622776601683794,
+          "marker7": 0.48304589153964794
+        }
+      },
+      "2": {
+        "mean_distance": 0.02857142857142857,
+        "sd_distance": 0.028171808490950554,
+        "position_sd": {
+          "marker0": 0.0,
+          "marker1": 0.31622776601683794,
+          "marker2": 0.31622776601683794,
+          "marker3": 0.4216370213557839,
+          "marker4": 0.5676462121975467,
+          "marker5": 0.31622776601683794,
+          "marker6": 0.5163977794943222,
+          "marker7": 0.5163977794943222
+        }
+      }
+    },
+    "between_group_distance_mean": {
+      "0-1": 0.04642857142857142,
+      "0-2": 0.039285714285714285,
+      "1-2": 0.04285714285714285
+    }
+  },
+  "paired_difference": {
+    "pairs": {
+      "0-1": 0.0,
+      "0-2": 0.0,
+      "1-2": 0.0
+    },
+    "max": 0.0,
+    "note": "p(diagnosis) - p(unrestricted); a large positive value marks composition-driven significance under the unrestricted reference"
+  },
+  "fits": {
+    "ok": 306,
+    "error": 0,
+    "timeout": 0
+  },
+  "timing": {
+    "wall_seconds": 18.72709883400239,
+    "observed_fit_seconds": 0.9932499160058796,
+    "mean_fit_seconds": 0.185824549977936,
+    "workers": 4
+  },
+  "provenance": {
+    "package_version": "concord-0.1.0",
+    "started_utc": "2026-09-13T12:42:20.039388+00:00",
+    "pyebm": {
+      "versions": {
+        "python": "3.12.7",
+        "pyebm": "2.0.3",
+        "numpy": "2.5.3",
+        "scipy": "1.18.1",
+        "pandas": "3.0.5",
+        "scikit-learn": "1.9.1",
+        "statsmodels": "0.15.0"
+      },
+      "pyebm_path": "/Users/tianchuangao/method/concord/.venv/lib/python3.12/site-packages/pyebm",
+      "source_sha256": {
+        "central_ordering/generalized_mallows.py": "9c05900c77e81d9499e6f02a6d62879bb1de1fea51095834897cac2042aba431",
+        "core_utilities.py": "e74650bfabea67885151142e142082feeeb944af50380db86256168ee0927972",
+        "mixture_model/gaussian_mixture_model.py": "591fddc3646822f8c045e71ff930c3f1f080cce63dc7121ae34dc9b6fad9b8b6"
+      },
+      "wheel_sha256": "246e1bb93db4ad0ed0c701f3e241b9c7ceda112599acff1c86291abaf6cb8df4"
+    },
+    "finished_utc": "2026-09-13T12:42:38.766922+00:00",
+    "engine_diagnostics_keys": [
+      "biomarkers",
+      "consensus",
+      "effective_sample_size",
+      "engine_version",
+      "event_centers_finite",
+      "invariant_engine_version",
+      "mode",
+      "optimizer",
+      "optimizer_calls",
+      "optimizer_failures",
+      "parameters_finite",
+      "pooled_mixture_cached",
+      "pooled_mixture_seconds",
+      "provenance",
+      "pyebm_biomarkers",
+      "quality_flags",
+      "reference_composition",
+      "seconds",
+      "variant",
+      "warnings",
+      "warnings_count"
+    ]
+  },
+  "observed_diagnostics": {
+    "engine_version": "consensus-v2.1",
+    "mode": "repaired",
+    "provenance": {
+      "versions": {
+        "python": "3.12.7",
+        "pyebm": "2.0.3",
+        "numpy": "2.5.3",
+        "scipy": "1.18.1",
+        "pandas": "3.0.5",
+        "scikit-learn": "1.9.1",
+        "statsmodels": "0.15.0"
+      },
+      "pyebm_path": "/Users/tianchuangao/method/concord/.venv/lib/python3.12/site-packages/pyebm",
+      "source_sha256": {
+        "central_ordering/generalized_mallows.py": "9c05900c77e81d9499e6f02a6d62879bb1de1fea51095834897cac2042aba431",
+        "core_utilities.py": "e74650bfabea67885151142e142082feeeb944af50380db86256168ee0927972",
+        "mixture_model/gaussian_mixture_model.py": "591fddc3646822f8c045e71ff930c3f1f080cce63dc7121ae34dc9b6fad9b8b6"
+      },
+      "wheel_sha256": "246e1bb93db4ad0ed0c701f3e241b9c7ceda112599acff1c86291abaf6cb8df4"
+    },
+    "quality_flags": [],
+    "consensus": [
+      {
+        "mode": "repaired",
+        "initial_score": 1.465215797135099,
+        "final_score": 1.465215797135099,
+        "accepted_swaps": 0,
+        "search_evaluations": 0,
+        "final_neighbor_evaluations": 9,
+        "termination": "no_improving_neighbor",
+        "local_optimal": true,
+        "best_neighbor_score": 1.4774711194632395,
+        "residual_improvement": 0.0
+      },
+      {
+        "mode": "repaired",
+        "initial_score": 1.7016714350873707,
+        "final_score": 1.7016714350873707,
+        "accepted_swaps": 0,
+        "search_evaluations": 0,
+        "final_neighbor_evaluations": 9,
+        "termination": "no_improving_neighbor",
+        "local_optimal": true,
+        "best_neighbor_score": 1.72809819846773,
+        "residual_improvement": 0.0
+      },
+      {
+        "mode": "repaired",
+        "initial_score": 1.6694127747910121,
+        "final_score": 1.6694127747910121,
+        "accepted_swaps": 0,
+        "search_evaluations": 0,
+        "final_neighbor_evaluations": 9,
+        "termination": "no_improving_neighbor",
+        "local_optimal": true,
+        "best_neighbor_score": 1.7126609592198365,
+        "residual_improvement": 0.0
+      }
+    ],
+    "optimizer": [
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 6,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 4,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 5,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 4,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 5,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 5,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 6,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 6,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 10,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 10,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 11,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 10,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 11,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 10,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 10,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 11,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 7,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 4,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 5,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 1,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 1,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 5,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 7,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 3,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 8,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 7,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 8,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 1,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 1,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 8,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 10,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 6,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 7,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 4,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 4,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 1,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 1,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 5,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 8,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 3,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 8,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 9,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 8,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 1,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 1,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 8,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 9,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      },
+      {
+        "method": "SLSQP",
+        "success": true,
+        "status": 0,
+        "nit": 7,
+        "message": "Optimization terminated successfully",
+        "finite_x": true,
+        "finite_objective": true
+      }
+    ],
+    "biomarkers": [
+      "marker0",
+      "marker1",
+      "marker2",
+      "marker3",
+      "marker4",
+      "marker5",
+      "marker6",
+      "marker7"
+    ],
+    "pyebm_biomarkers": [
+      "marker0",
+      "marker1",
+      "marker2",
+      "marker3",
+      "marker4",
+      "marker5",
+      "marker6",
+      "marker7"
+    ],
+    "parameters_finite": true,
+    "event_centers_finite": true,
+    "optimizer_calls": 48,
+    "optimizer_failures": 0,
+    "warnings_count": 0,
+    "warnings": [],
+    "seconds": 0.401782542001456,
+    "invariant_engine_version": "invariant-v1.0",
+    "variant": "invariant_min",
+    "reference_composition": "min",
+    "effective_sample_size": {
+      "0": 70.47804026855901,
+      "1": 185.80874895702058,
+      "2": 201.85213865269682
+    },
+    "pooled_mixture_cached": false,
+    "pooled_mixture_seconds": 0.23056687484495342
+  }
+}

@@ -137,7 +137,8 @@ def prepare_data(df, group_column="APOE", labels=("CN", "MCI", "AD"), biomarkers
         raise ValueError(f"Diagnosis values outside labels {labels}: {unknown}")
     if df[group_column].isna().any():
         raise ValueError(f"missing values in group column {group_column!r}")
-    observed = sorted(df[group_column].unique(), key=lambda v: (str(type(v)), v))
+    observed = sorted((v.item() if hasattr(v, "item") else v for v in df[group_column].unique()),
+                      key=lambda v: (str(type(v)), v))
     if group_order is None:
         group_values = tuple(observed)
     else:
@@ -417,7 +418,12 @@ def _jsonable(value):
 
 
 class _Runner:
-    """Runs tasks inline (workers=1) or in a spawn pool; one API for both."""
+    """Runs tasks inline (workers=1) or in a spawn-based process pool; one API for both.
+
+    A ``concurrent.futures`` pool is used rather than ``multiprocessing.Pool`` because a worker that
+    dies (for example when an unguarded script is re-imported by the spawned process) surfaces as
+    ``BrokenProcessPool`` instead of an indefinite hang.
+    """
 
     def __init__(self, df, spec, definitions, workers):
         self.workers = max(1, int(workers))
@@ -425,14 +431,15 @@ class _Runner:
         if self.workers == 1:
             _init_worker(df, spec, definitions)
         else:
+            from concurrent.futures import ProcessPoolExecutor
             previous = {}
             for var in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS",
                         "NUMEXPR_NUM_THREADS", "VECLIB_MAXIMUM_THREADS"):
                 previous[var] = os.environ.get(var)
                 os.environ[var] = "1"          # inherited by the spawned workers only
             try:
-                self.pool = get_context("spawn").Pool(self.workers, initializer=_init_worker,
-                                                      initargs=(df, spec, definitions))
+                self.pool = ProcessPoolExecutor(max_workers=self.workers, mp_context=get_context("spawn"),
+                                                initializer=_init_worker, initargs=(df, spec, definitions))
             finally:
                 for var, value in previous.items():
                     if value is None:
@@ -444,13 +451,23 @@ class _Runner:
         if self.pool is None:
             for task in tasks:
                 yield _run_task(task)
-        else:
-            yield from self.pool.imap_unordered(_run_task, tasks, chunksize=1)
+            return
+        from concurrent.futures import as_completed
+        from concurrent.futures.process import BrokenProcessPool
+        futures = [self.pool.submit(_run_task, task) for task in tasks]
+        try:
+            for future in as_completed(futures):
+                yield future.result()
+        except BrokenProcessPool as exc:
+            raise RuntimeError(
+                "a CONCORD worker process died before returning a result. The usual cause is a script that "
+                "calls concord.compare(..., workers>1) outside an `if __name__ == '__main__':` guard, so the "
+                "spawned workers re-run it; other causes are out-of-memory or a crash in a native library. "
+                "Run with workers=1 to see the underlying error.") from exc
 
     def close(self):
         if self.pool is not None:
-            self.pool.close()
-            self.pool.join()
+            self.pool.shutdown(wait=True, cancel_futures=True)
 
 
 # ----------------------------------------------------------------------------- result
@@ -536,6 +553,12 @@ def compare(df, group_column="APOE", labels=("CN", "MCI", "AD"), biomarkers=None
     ``workers`` > 1 runs fits in a spawn pool (each worker caches its own pooled mixture).
     ``stability_resamples`` = 0 skips the resampling diagnostic.
     """
+    import multiprocessing
+    if multiprocessing.parent_process() is not None:
+        raise RuntimeError(
+            "concord.compare() was called inside a worker process. With workers > 1 the workers are spawned "
+            "and re-import the main script, so put the call under `if __name__ == '__main__':` "
+            "(the command-line entry point and importable modules are already safe).")
     wall_started = time.monotonic()
     provenance = {"package_version": PACKAGE_VERSION, "started_utc": _utc()}
     if estimator != "saebm":

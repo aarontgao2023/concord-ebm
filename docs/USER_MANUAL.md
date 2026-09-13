@@ -7,7 +7,7 @@ this manual has everything else.
 
 Contents: [Quick start](#quick-start) · [Why](#why) · [Input](#input) · [Options](#options) ·
 [Output](#output) · [Reading the diagnostics](#reading-the-diagnostics) · [When not to use it](#assumptions-and-when-not-to-use-it) ·
-[Performance](#performance) · [Simulator](#simulator) · [Command line](#command-line) · [Licence](#licence-and-provenance)
+[Performance](#performance) · [Paper repository](#simulations-manuscript-and-adni-analysis) · [Command line](#command-line) · [Licence](#licence-and-provenance)
 
 ## Quick start
 
@@ -73,7 +73,7 @@ standard DEBM fit.
 | `stop_when_decided` | `False` | stop a reference once every required decision is exact; *p* is then a bound |
 | `stability_resamples` | `20` | group × diagnosis stratified bootstrap refits for the stability diagnostic (0 to skip) |
 | `seed` | `0` | seeds every permutation and resample stream (reproducible) |
-| `workers` | `1` | spawn-pool size; each worker caches its own pooled mixture |
+| `workers` | `1` | spawn-pool size; each worker caches its own pooled mixture. In a script, put the call under `if __name__ == "__main__":` — spawned workers re-import the main file, and an unguarded call would run again in every worker (CONCORD raises a clear error instead of hanging) |
 | `fit_timeout_s` | `900` | per-fit wall-clock limit; a timed-out fit counts as failed (unknown), never as a non-exceedance |
 | `consensus` | `"repaired"` | `pyebm` consensus arm: `"repaired"` continues the local search after an accepted swap; `"original"` is upstream's |
 | `fast_likelihood` | `True` | numerically identical, faster GMM objective (see `concord/likelihood.py`) |
@@ -140,12 +140,11 @@ is cached per worker process, so a full comparison at *n* ≈ 1,000, *B* = 599, 
 stability resamples takes about twelve minutes on 32 cores (about 4.7 core-hours); the standard estimator,
 which has nothing to cache, takes about four times longer.
 
-## Simulator
+## Simulations, manuscript and ADNI analysis
 
-`concord.simulate` contains the ADNI-shaped data-generating process used in the paper (`resolve(name)` /
-`simulate(cfg, seed)`), including the named cells (`REF_H0`, `IID_H0`, `BALANCED_H0`, `STAGE_H0`,
-`PDF_H0`, `MISS_CSF_H0`, `MISS_ALL_H0`, `PWR_E4_K27`, …). `examples/quickstart.py` runs the whole
-procedure on one simulated cohort.
+The ADNI-shaped simulator, the pre-registered simulation protocols (configurations, seeds, HPC scripts,
+frozen analysis code) and the result tables behind the numbers quoted here live in the companion repository
+[concord-ebm-paper](https://github.com/aarontgao2023/concord-ebm-paper). This package contains the method only.
 
 ## Command line
 

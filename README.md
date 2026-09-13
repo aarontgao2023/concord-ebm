@@ -49,7 +49,9 @@ size, resampling stability, and the stratified-minus-unrestricted *p* difference
 ## Read more
 
 - [User manual](docs/USER_MANUAL.md) — input format, every option, the output schema, how to read the
-  diagnostics, when not to use it, the simulator, performance.
+  diagnostics, when not to use it, performance.
+- [concord-ebm-paper](https://github.com/aarontgao2023/concord-ebm-paper) — the simulations, manuscript and
+  ADNI analysis behind the method (this repository is the method only).
 - [Changelog](CHANGELOG.md)
 
 ## Cite
