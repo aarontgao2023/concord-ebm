@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "concord-ebm"
+dynamic = ["version"]
+description = "CONCORD: composition-invariant comparison of event-based model (EBM) orderings between groups"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "GPL-3.0-or-later"}
+authors = [{name = "Tianchuan Gao"}]
+keywords = ["event-based model", "disease progression", "biomarker ordering", "permutation test", "Alzheimer's disease"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Bio-Informatics",
+  "Topic :: Scientific/Engineering :: Medical Science Apps.",
+]
+dependencies = [
+  "pyebm==2.0.3",
+  "numpy>=1.24",
+  "pandas>=2.0",
+  "scipy>=1.10",
+]
+
+[project.optional-dependencies]
+saebm = ["pysaebm"]
+dev = ["pytest>=7", "build", "twine"]
+
+[project.scripts]
+concord = "concord.core:main"
+
+[project.urls]
+Homepage = "https://github.com/aarontgao2023/concord-ebm"
+Issues = "https://github.com/aarontgao2023/concord-ebm/issues"
+
+[tool.setuptools.dynamic]
+version = {attr = "concord._version.__version__"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = ["ignore:Importing from numpy.matlib:PendingDeprecationWarning", "ignore::DeprecationWarning:pyebm.*"]
