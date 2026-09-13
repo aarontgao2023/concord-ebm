@@ -1,5 +1,7 @@
 # CONCORD
 
+**CO**mposition-**N**ormalised **C**onsensus for **ORD**ering comparison
+
 Compare event-based model (EBM) orderings between groups — without the group's diagnostic
 composition deciding the answer.
 
