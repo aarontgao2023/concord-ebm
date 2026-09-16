@@ -67,7 +67,7 @@ standard DEBM fit.
 | argument | default | meaning |
 |---|---|---|
 | `estimator` | `"invariant_min"` | see the table below |
-| `schemes` | `("unrestricted", "diagnosis", "diagnosis_pair")` | reference distributions; `diagnosis_pair` expands to one scheme per pair (skipped with two groups) |
+| `schemes` | `("unrestricted", "diagnosis", "diagnosis_pair")` | reference distributions; `diagnosis_pair` expands to one scheme per pair (skipped with two groups); the optional `diagnosis_count` exchanges labels within diagnosis × number-of-observed-biomarkers strata (the repair operator for group-specific missingness) |
 | `B` | `599` | permutations per reference |
 | `alpha`, `rule` | `0.05`, `"le"` | rejection rule: pair *p* ≤ α / n_pairs, max *p* ≤ α (`"strict"` uses <) |
 | `stop_when_decided` | `False` | stop a reference once every required decision is exact; *p* is then a bound |

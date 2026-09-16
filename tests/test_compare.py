@@ -64,6 +64,22 @@ class OperatorTests(unittest.TestCase):
                                            "diagnosis_pair_0-2", "diagnosis_pair_1-2"])
         two = ec.CompareSpec("APOE", (0, 1), ("CN", "MCI", "AD"), self.names)
         self.assertEqual(list(ec.scheme_definitions(two, ec.SCHEMES)), ["unrestricted", "diagnosis"])
+        opt = ec.scheme_definitions(self.spec, ("diagnosis_count",))
+        self.assertEqual(opt["diagnosis_count"]["stratify"], "diagnosis_count")
+
+    def test_diagnosis_count_preserves_diagnosis_by_count_tables(self):
+        f = self.frame.copy()
+        rng = np.random.default_rng(3)
+        for name in self.names[:3]:
+            f.loc[rng.random(len(f)) < 0.3, name] = np.nan
+        definition = ec.scheme_definitions(self.spec, ("diagnosis_count",))["diagnosis_count"]
+        permuted = ec.permute_labels(f, self.spec, "diagnosis_count", definition, 1)
+        count = f[list(self.names)].notna().sum(axis=1)
+        before = pd.crosstab([f["Diagnosis"], count], f["APOE"])
+        after = pd.crosstab([permuted["Diagnosis"], count], permuted["APOE"])
+        pd.testing.assert_frame_equal(before, after)
+        self.assertFalse(permuted["APOE"].equals(f["APOE"]))
+        pd.testing.assert_frame_equal(permuted[list(self.names)], f[list(self.names)])
 
     def test_stratified_permutations_preserve_strata_and_pair_leaves_third_fixed(self):
         f = self.frame

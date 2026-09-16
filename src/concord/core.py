@@ -24,6 +24,8 @@ Reference distributions (``schemes=``), all relabelling only the group column:
   unrestricted      labels exchanged among all subjects (the published U-all operator)
   diagnosis         labels exchanged within diagnosis strata (D-all; primary)
   diagnosis_pair    for each pair, only that pair's labels exchanged within diagnosis
+  diagnosis_count   labels exchanged within diagnosis x number-of-observed-biomarkers strata
+                    (the repair operator for group-specific missingness)
                     strata; the third group is left untouched (D-pair; localisation)
 The maximum pairwise distance is evaluated against the unrestricted and diagnosis
 references (U-max, D-max).
@@ -68,7 +70,8 @@ from .likelihood import fast_likelihood_context
 
 PACKAGE_VERSION = f"concord-{__version__}"
 ESTIMATORS = ("invariant_min", "invariant_pooled", "shared", "standard", "saebm")
-SCHEMES = ("unrestricted", "diagnosis", "diagnosis_pair")
+SCHEMES = ("unrestricted", "diagnosis", "diagnosis_pair")          # default set (frozen protocol)
+OPTIONAL_SCHEMES = ("diagnosis_count",)                             # repair operator, on request
 PERMUTATION_STREAM = 61000000      # same stream constant as the simulation runner (reproducible permutations)
 RESAMPLE_STREAM = 62000000
 _RESERVED_TOKENS = ("PTID", "Diagnosis", "EXAMDATE")   # pyebm drops columns by substring
@@ -246,8 +249,11 @@ def scheme_definitions(spec: CompareSpec, schemes):
             for index, pair in enumerate(spec.pairs):
                 out[f"diagnosis_pair_{spec.pair_name(pair)}"] = {
                     "stratify": "diagnosis", "groups": list(pair), "pair_index": index}
+        elif scheme == "diagnosis_count":
+            # repair operator: strata of diagnosis x number of observed biomarkers
+            out[scheme] = {"stratify": "diagnosis_count", "groups": all_groups, "pair_index": None}
         else:
-            raise ValueError(f"unknown scheme {scheme!r}; choose from {SCHEMES}")
+            raise ValueError(f"unknown scheme {scheme!r}; choose from {SCHEMES + OPTIONAL_SCHEMES}")
     return out
 
 
@@ -259,6 +265,9 @@ def permute_labels(df, spec: CompareSpec, name, definition, index):
         strata = np.zeros(len(df), dtype=int)
     elif definition["stratify"] == "diagnosis":
         strata = df["Diagnosis"].to_numpy()
+    elif definition["stratify"] == "diagnosis_count":
+        observed = df[list(spec.biomarkers)].notna().sum(axis=1).to_numpy()
+        strata = np.asarray([f"{d}:{k}" for d, k in zip(df["Diagnosis"].to_numpy(), observed)])
     else:
         raise ValueError(f"unknown stratification {definition['stratify']!r}")
     allowed = np.isin(labels, definition["groups"])
