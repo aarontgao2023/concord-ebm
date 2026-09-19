@@ -7,11 +7,11 @@ composition deciding the answer.
 
 ![CONCORD mechanism](docs/figures/concord_mechanism.png)
 
-**(A)** Fitting an EBM separately to each group gives orderings whose *target* depends on how many
+**(a)** Fitting an EBM separately to each group gives orderings whose *target* depends on how many
 healthy, impaired and demented subjects the group happens to contain: two groups with the same
 disease process end up with different orderings, and a permutation test that shuffles labels among
 everyone compares them against a world in which the groups look alike.
-**(B)** CONCORD fits one measurement model for all subjects, averages every group's evidence at one
+**(b)** CONCORD fits one measurement model for all subjects, averages every group's evidence at one
 reference composition, and shuffles labels only within diagnosis strata — so both groups estimate the
 same target and the reference distribution keeps each group's composition.
 
