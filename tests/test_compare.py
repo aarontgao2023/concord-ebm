@@ -205,3 +205,20 @@ class EndToEndTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ReferenceChoiceTests(unittest.TestCase):
+    def test_explicit_reference_equals_named_reference(self):
+        # an explicit (CN, MCI, AD) vector equal to the pooled mix must reproduce invariant_pooled exactly
+        from concord.engine import EngineConfig
+        from concord.invariant import fit_invariant_orderings
+        frame, groups, names = ec.prepare_data(small_dataset(), "APOE", ("CN", "MCI", "AD"))
+        cfg = EngineConfig(mode="repaired", expected_events=4, group_column="APOE", group_values=(0, 1, 2),
+                           labels=("CN", "MCI", "AD"), biomarker_names=tuple(names))
+        pooled = [(frame["Diagnosis"] == d).mean() for d in ("CN", "MCI", "AD")]
+        a = fit_invariant_orderings(frame, cfg, variant="invariant_pooled", use_cache=False)
+        b = fit_invariant_orderings(frame, cfg, variant="invariant_min", reference=pooled, use_cache=False)
+        self.assertEqual([o.tolist() for o in a.orderings], [o.tolist() for o in b.orderings])
+        self.assertEqual(b.diagnostics["reference_composition"], [float(x) for x in pooled])
+        with self.assertRaises(ValueError):
+            fit_invariant_orderings(frame, cfg, reference=(1, 0), use_cache=False)

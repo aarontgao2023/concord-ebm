@@ -54,6 +54,11 @@ def composition_weights(diag, gv, mask, ref):
         pi_ref = np.array([(diag[mask] == c).mean() for c in CODES])
     elif ref == "min":
         m = np.min(np.stack([comp[g] for g in gvals]), axis=0); pi_ref = m / m.sum()
+    elif isinstance(ref, (tuple, list, np.ndarray)):
+        pi_ref = np.asarray(ref, dtype=float)                 # an explicit reference composition
+        if pi_ref.shape != CODES.shape or (pi_ref < 0).any() or pi_ref.sum() <= 0:
+            raise ValueError("an explicit reference must be three nonnegative proportions (CN, MCI, AD)")
+        pi_ref = pi_ref / pi_ref.sum()
     else:
         raise ValueError(f"Unknown reference composition: {ref!r}")
     weights, ess = {}, {}
@@ -73,10 +78,16 @@ def composition_weights(diag, gv, mask, ref):
 
 
 def fit_invariant_orderings(df, engine_config: EngineConfig | None = None, variant: str = "invariant_min",
-                            use_cache: bool = True) -> FitResult:
+                            use_cache: bool = True, reference=None) -> FitResult:
+    """`reference`: optional explicit (CN, MCI, AD) proportions that override the variant's reference
+    composition (pooled measurement model kept). Used to study the effect of the reference choice."""
     if variant not in VARIANTS:
         raise ValueError(f"Unknown variant {variant!r}; choose from {sorted(VARIANTS)}")
     ref = VARIANTS[variant]
+    if reference is not None:
+        ref = tuple(float(x) for x in reference)
+        if len(ref) != len(CODES) or any(x < 0 for x in ref) or sum(ref) <= 0:
+            raise ValueError("reference must be three nonnegative proportions (CN, MCI, AD)")
     config = engine_config or EngineConfig(mode="repaired")
     import pyebm.core_utilities as cu
     from pyebm.central_ordering import generalized_mallows as gm
@@ -163,7 +174,7 @@ def fit_invariant_orderings(df, engine_config: EngineConfig | None = None, varia
         while len(_CACHE) > _CACHE_MAX:
             _CACHE.popitem(last=False)
     result.diagnostics.update(invariant_engine_version=INVARIANT_ENGINE_VERSION, variant=variant,
-                              reference_composition=ref, effective_sample_size=info["ess"],
+                              reference_composition=list(ref) if isinstance(ref, tuple) else ref, effective_sample_size=info["ess"],
                               pooled_mixture_cached=info["mixture_cached"],
                               pooled_mixture_seconds=cache.get("seconds"))
     return result
