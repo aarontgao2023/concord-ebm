@@ -1,14 +1,16 @@
-"""Audited co-init DEBM engines with one explicitly isolated algorithm change.
+"""DEBM fits through pyebm 2.0.3, with one optional change to the ranking-consensus search.
 
-``original`` calls the unmodified pyebm 2.0.3 consensus implementation.
-``repaired`` retains its initialization, weighted Kendall objective, adjacent
-neighborhood and strict improvement rule, but continues after an accepted swap.
-No mixture-model optimization or convergence rule is changed in either arm.
+Mode ``original`` (``search='pyebm'`` in concord.compare) calls the unmodified pyebm 2.0.3 search,
+which stops after the first accepted adjacent swap. Mode ``repaired`` (``search='continued'``, the
+default of concord.compare) keeps pyebm's initialization, ranking loss, adjacent-swap neighborhood
+and strict-improvement rule, but continues after an accepted swap until no adjacent swap lowers
+the loss (or the 10,000-evaluation budget is reached). Mixture fitting and its stopping rule are
+unchanged in both modes: for separately fitted DEBM, pyebm stops the mixture fitting when the mean
+change in mixing proportions falls below 0.01 in the first group.
 
-Use one engine call at a time in each multiprocessing worker. Temporary patches
-are restored even on exceptions; a process-local lock serializes these wrappers.
-The caller supplies fit timeouts and decides how to handle quality flags. In
-particular, a failed SLSQP success flag is recorded, not silently excluded.
+The temporary patches are process-local, serialized by a lock and restored even on exceptions;
+run one fit at a time in each worker process. The caller sets fit timeouts and decides how to
+handle quality flags; a failed SLSQP success flag is recorded, not silently excluded.
 """
 from __future__ import annotations
 

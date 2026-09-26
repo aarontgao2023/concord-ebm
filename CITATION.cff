@@ -1,11 +1,33 @@
 cff-version: 1.2.0
-title: "CONCORD: composition-invariant comparison of event-based model orderings between groups"
-message: "If you use this software, please cite the accompanying manuscript (in preparation) and this repository."
+title: "CONCORD: composition-normalized consensus for ordering comparison"
+message: "If you use CONCORD, please cite the manuscript given under preferred-citation."
 type: software
 authors:
   - family-names: Gao
     given-names: Tianchuan
-version: 0.1.0
-date-released: 2026-09-13
+version: "0.2.0"
+date-released: "2026-09-26"
 license: GPL-3.0-or-later
-repository-code: https://github.com/aarontgao2023/concord-ebm
+repository-code: "https://github.com/aarontgao2023/concord-ebm"
+abstract: >-
+  CONCORD compares the event orderings of two or more patient groups whose diagnostic
+  composition differs. It fits one abnormality model to the pooled sample, weights every
+  group to the same diagnostic proportions and tests group differences by permuting group
+  labels within diagnosis.
+keywords:
+  - event-based model
+  - disease progression
+  - biomarker ordering
+  - permutation test
+  - Alzheimer's disease
+preferred-citation:
+  type: article
+  title: "Comparing biomarker orderings between patient groups with different diagnostic composition"
+  authors:
+    - family-names: Gao
+      given-names: Tianchuan
+    - family-names: Liu
+      given-names: Haoyuan
+    - family-names: Yan
+      given-names: Jingwen
+  status: in-preparation

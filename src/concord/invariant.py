@@ -1,21 +1,32 @@
-"""Composition-invariant DEBM estimators for between-group ordering comparison.
+"""Pooled abnormality model and diagnosis weights (CONCORD and pooled-score DEBM).
 
-Three variants, all implemented as process-local patches on pyebm 2.0.3 and executed
-through concord.engine.fit_orderings (repaired consensus), so validation, provenance and
-diagnostics are the frozen pipeline's own:
+Both estimators fit one two-component Gaussian mixture per biomarker to the pooled sample of the
+compared groups (pyebm 2.0.3 with no group argument), so that the same measurement receives the
+same probability of being abnormal in every group. Each group's ordering is then estimated with
+the DEBM ranking consensus, run through concord.engine.fit_orderings. The variants differ only in
+the participant weights applied to the ranking loss:
 
-  shared            one two-component mixture per biomarker fitted on the POOLED sample
-                    (Groups=[]), replicated to every group; per-group consensus unchanged.
-  invariant_pooled  shared mixture + consensus standardised to the pooled diagnostic
-                    composition (weights pi_ref[d]/pi_g[d] as a weighted mean over subjects).
-  invariant_min     shared mixture + consensus standardised to the renormalised element-wise
-                    minimum composition over groups (lowest weight variance; the default).
+  shared            pooled-score DEBM: every participant has weight one.
+  invariant_min     CONCORD: a participant with diagnosis d in group g has weight
+                    w = pi*(d) / pihat_g(d), where pihat_g(d) is the proportion of diagnosis d in
+                    group g and pi*(d) are the common proportions. Each group's ordering minimizes
+                    the weighted mean ranking loss, so after weighting every diagnosis accounts
+                    for the same share pi*(d) of every group. By default pi*(d) is the smallest
+                    proportion of diagnosis d across the compared groups, rescaled to sum to one
+                    (the minimum rule); this gives the smallest possible largest weight, 1/kappa
+                    with kappa = sum_d min_g pihat_g(d). Fixed common proportions can be passed
+                    instead (``reference=``); every diagnosis with a positive proportion must then
+                    be present in every group.
+  invariant_pooled  weights to the diagnostic proportions of the pooled sample (not used in the
+                    paper).
 
-The pooled mixture depends on the biomarker values only, never on the group labels, so it is
-identical under every relabelling of the same dataset and may be cached: a small
-process-local LRU keyed by a hash of the biomarker matrix holds the fitted parameters and
-subject posteriors. Every label-dependent step (weights, consensus) is recomputed for every
-call. Uniform weights reproduce the standard pooled-mixture fit exactly.
+The pooled mixture depends on the measurements and the diagnoses (its two components are
+initialized from the CN and AD participants), not on the group labels, so it is the same after
+every relabeling of a dataset and is cached: a small process-local cache keyed by a hash of the
+biomarker matrix, the biomarker names and the pyebm diagnosis codes holds the fitted parameters and
+the participants' posterior probabilities. Everything that depends on the group labels (weights,
+orderings) is recomputed at every call. With all weights equal to one, CONCORD reproduces
+pooled-score DEBM exactly.
 """
 from __future__ import annotations
 
@@ -27,67 +38,113 @@ import numpy as np
 
 from .engine import EngineConfig, FitResult, fit_orderings
 
-INVARIANT_ENGINE_VERSION = "invariant-v1.0"
+INVARIANT_ENGINE_VERSION = "invariant-v1.1"
 VARIANTS = {"shared": None, "invariant_pooled": "pooled", "invariant_min": "min"}
 _CACHE: "OrderedDict[str, dict]" = OrderedDict()
 _CACHE_MAX = 6
 CODES = np.array([1, 2, 3])          # pyebm diagnosis codes: CN, MCI, AD
+_CODE_NAMES = ("CN", "MCI", "AD")
 
 
-def _matrix_key(df, names):
+def _diagnosis_codes(df, labels):
+    """pyebm diagnosis codes per row: 1 for the first label (CN), 3 for the last (AD), 2 otherwise."""
+    labels = [str(label) for label in labels]
+    diagnosis = df["Diagnosis"].astype(str).to_numpy()
+    return np.where(diagnosis == labels[0], 1, np.where(diagnosis == labels[-1], 3, 2)).astype(np.int8)
+
+
+def _matrix_key(df, names, labels=("CN", "MCI", "AD")):
+    """Cache key of the pooled mixture: the biomarker matrix, the biomarker names and the diagnosis
+    codes (the mixture is initialized from the CN and AD participants). The group column is left
+    out, so the key is the same after every relabeling."""
+    names = [str(name) for name in names]
     values = np.ascontiguousarray(df[names].to_numpy(dtype=float))
     h = hashlib.sha256(values.tobytes()); h.update("|".join(names).encode())
+    h.update(b"|diagnosis|"); h.update(np.ascontiguousarray(_diagnosis_codes(df, labels)).tobytes())
     return h.hexdigest()
 
 
-def composition_weights(diag, gv, mask, ref):
-    """diag: int codes per row; gv: group value per row; mask: rows used. Returns
-    (group values in np.unique order, {g: weight vector over g's masked rows}, ESS by group)."""
+def _weights(diag, gv, mask, ref):
+    """Common proportions, participant weights, effective sample sizes and weights per diagnosis.
+
+    Returns (group values in np.unique order, {g: weight vector over g's masked rows}, ESS by group,
+    common proportions over CODES or None, {g: [weight of each diagnosis code or None if absent]}).
+    """
     gvals = np.unique(gv)
     comp = {}
     for g in gvals:
         rows = (gv == g) & mask
         comp[g] = np.array([(diag[rows] == c).mean() for c in CODES])
     if ref is None:
-        pi_ref = None
-    elif ref == "pooled":
-        pi_ref = np.array([(diag[mask] == c).mean() for c in CODES])
-    elif ref == "min":
-        m = np.min(np.stack([comp[g] for g in gvals]), axis=0); pi_ref = m / m.sum()
+        pi_common = None
+    elif isinstance(ref, str) and ref == "pooled":
+        pi_common = np.array([(diag[mask] == c).mean() for c in CODES])
+    elif isinstance(ref, str) and ref == "min":
+        m = np.min(np.stack([comp[g] for g in gvals]), axis=0)
+        if not m.sum() > 0:
+            raise ValueError("no diagnosis is present in every group, so the minimum rule is undefined")
+        pi_common = m / m.sum()
     elif isinstance(ref, (tuple, list, np.ndarray)):
-        pi_ref = np.asarray(ref, dtype=float)                 # an explicit reference composition
-        if pi_ref.shape != CODES.shape or (pi_ref < 0).any() or pi_ref.sum() <= 0:
-            raise ValueError("an explicit reference must be three nonnegative proportions (CN, MCI, AD)")
-        pi_ref = pi_ref / pi_ref.sum()
+        pi_common = np.asarray(ref, dtype=float)                 # fixed common proportions
+        if (pi_common.shape != CODES.shape or not np.isfinite(pi_common).all() or (pi_common < 0).any()
+                or pi_common.sum() <= 0):
+            raise ValueError("fixed common proportions must be three nonnegative values (CN, MCI, AD)")
+        pi_common = pi_common / pi_common.sum()
+        for g in gvals:
+            lacking = [_CODE_NAMES[k] for k in range(len(CODES)) if pi_common[k] > 0 and not comp[g][k] > 0]
+            if lacking:
+                raise ValueError(f"diagnosis {', '.join(lacking)} has a positive common proportion but no "
+                                 f"participants in group {g}")
     else:
-        raise ValueError(f"Unknown reference composition: {ref!r}")
-    weights, ess = {}, {}
+        raise ValueError(f"Unknown common proportions: {ref!r}")
+    weights, ess, cells = {}, {}, {}
     for g in gvals:
         rows = (gv == g) & mask; d = diag[rows]
-        if pi_ref is None:
+        if pi_common is None:
             w = np.ones(int(rows.sum()))
+            cells[str(g)] = [1.0 if comp[g][k] > 0 else None for k in range(len(CODES))]
         else:
             w = np.zeros(int(rows.sum()))
+            cell = [None] * len(CODES)
             for k, c in enumerate(CODES):
                 sel = d == c
                 if sel.any():
-                    w[sel] = pi_ref[k] / comp[g][k]
+                    w[sel] = pi_common[k] / comp[g][k]
+                    cell[k] = float(pi_common[k] / comp[g][k])
+            cells[str(g)] = cell
         weights[g] = w
         ess[str(g)] = float(w.sum() ** 2 / (w ** 2).sum())
+    return gvals, weights, ess, (None if pi_common is None else [float(x) for x in pi_common]), cells
+
+
+def composition_weights(diag, gv, mask, ref):
+    """diag: int codes per row; gv: group value per row; mask: rows used; ref: None (unit weights),
+    'min', 'pooled' or three fixed common proportions (CN, MCI, AD). Returns
+    (group values in np.unique order, {g: weight vector over g's masked rows}, ESS by group)."""
+    gvals, weights, ess, _, _ = _weights(diag, gv, mask, ref)
     return gvals, weights, ess
 
 
 def fit_invariant_orderings(df, engine_config: EngineConfig | None = None, variant: str = "invariant_min",
                             use_cache: bool = True, reference=None) -> FitResult:
-    """`reference`: optional explicit (CN, MCI, AD) proportions that override the variant's reference
-    composition (pooled measurement model kept). Used to study the effect of the reference choice."""
+    """Fit every group's ordering with the pooled abnormality model and the variant's weights.
+
+    ``reference``: optional fixed common proportions (CN, MCI, AD) that replace the variant's rule
+    (the pooled abnormality model is kept). Every diagnosis with a positive proportion must be
+    present in every group; otherwise the fit returns status 'error'. A proportion of 0 gives the
+    participants with that diagnosis weight 0 (they still enter the pooled mixture). The
+    diagnostics record the common proportions, the weight of each diagnosis in each group and the
+    effective sample sizes.
+    """
     if variant not in VARIANTS:
         raise ValueError(f"Unknown variant {variant!r}; choose from {sorted(VARIANTS)}")
     ref = VARIANTS[variant]
+    rule = ref
     if reference is not None:
         ref = tuple(float(x) for x in reference)
-        if len(ref) != len(CODES) or any(x < 0 for x in ref) or sum(ref) <= 0:
+        if len(ref) != len(CODES) or not np.isfinite(ref).all() or any(x < 0 for x in ref) or sum(ref) <= 0:
             raise ValueError("reference must be three nonnegative proportions (CN, MCI, AD)")
+        rule = "fixed"
     config = engine_config or EngineConfig(mode="repaired")
     import pyebm.core_utilities as cu
     from pyebm.central_ordering import generalized_mallows as gm
@@ -95,11 +152,12 @@ def fit_invariant_orderings(df, engine_config: EngineConfig | None = None, varia
     metadata = {"PTID", "Diagnosis", "EXAMDATE", config.group_column}
     names = list(config.biomarker_names) if config.biomarker_names is not None else [
         c for c in df.columns if c not in metadata]
-    key = _matrix_key(df, names) if use_cache else None
+    key = _matrix_key(df, names, config.labels) if use_cache else None
     cache = _CACHE.get(key) if key else None
     if cache is None:
         cache = {}
-    holder, queue, cur, info = {}, [], {}, {"ess": None, "mixture_cached": cache.get("params") is not None}
+    holder, queue, cur = {}, [], {}
+    info = {"ess": None, "proportions": None, "cells": None, "mixture_cached": cache.get("params") is not None}
 
     orig_mm, orig_parse, orig_fco = cu.do_mixturemodel, cu.parse_inputs, cu.find_central_ordering
     fm_desc, fm_orig = gm.weighted_mallows.__dict__["fitMallows"], gm.weighted_mallows.fitMallows
@@ -135,8 +193,9 @@ def fit_invariant_orderings(df, engine_config: EngineConfig | None = None, varia
             raise RuntimeError("row order of Data_all differs from parse_inputs output")
         gv = np.asarray(GroupValues[0])
         mask = np.asarray(maskidx, bool) if len(maskidx) else np.ones(len(gv), bool)
-        gvals, W, ess = composition_weights(holder["diag"], gv, mask, ref)
-        queue[:] = [W[g] for g in gvals]; info["ess"] = ess
+        gvals, W, ess, proportions, cells = _weights(holder["diag"], gv, mask, ref)
+        queue[:] = [W[g] for g in gvals]
+        info.update(ess=ess, proportions=proportions, cells=cells)
         return orig_fco(Data_all, p_yes, BP, Groups, GroupValues, DMO, algo_type, maskidx)
 
     def fm(p_yes, mixing):
@@ -174,7 +233,8 @@ def fit_invariant_orderings(df, engine_config: EngineConfig | None = None, varia
         while len(_CACHE) > _CACHE_MAX:
             _CACHE.popitem(last=False)
     result.diagnostics.update(invariant_engine_version=INVARIANT_ENGINE_VERSION, variant=variant,
-                              reference_composition=list(ref) if isinstance(ref, tuple) else ref, effective_sample_size=info["ess"],
+                              common_proportions_rule=rule, common_proportions=info["proportions"],
+                              group_weights=info["cells"], effective_sample_size=info["ess"],
                               pooled_mixture_cached=info["mixture_cached"],
                               pooled_mixture_seconds=cache.get("seconds"))
     return result

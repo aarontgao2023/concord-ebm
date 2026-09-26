@@ -1,8 +1,8 @@
 """Identify the unmodified upstream pyebm implementation the engines patch.
 
 This module never installs packages or edits upstream source. Install the pinned
-wheel in an isolated environment before running the study. Source fingerprints
-also detect a locally edited installation that still reports version 2.0.3.
+wheel (pyebm==2.0.3) before running CONCORD. Source fingerprints also detect a
+locally edited installation that still reports version 2.0.3.
 """
 from functools import lru_cache
 from hashlib import sha256

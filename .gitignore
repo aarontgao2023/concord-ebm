@@ -8,3 +8,4 @@ dist/
 .DS_Store
 *.log
 examples/output/
+examples/output_demo/

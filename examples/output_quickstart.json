@@ -21,20 +21,19 @@
       "marker6",
       "marker7"
     ],
-    "estimator": "invariant_min",
-    "consensus": "repaired",
+    "estimator": "concord",
+    "search": "continued",
     "fast_likelihood": true,
     "fit_timeout_s": 900,
     "seed": 1,
-    "saebm_iterations": 2000,
-    "saebm_burn_in": 500,
+    "saebm_iterations": 10000,
+    "saebm_burn_in": 2500,
+    "common_proportions": "min",
     "B": 59,
     "schemes": [
-      "unrestricted",
-      "diagnosis",
-      "diagnosis_pair_0-1",
-      "diagnosis_pair_0-2",
-      "diagnosis_pair_1-2"
+      "pairwise_within_diagnosis_0-1",
+      "pairwise_within_diagnosis_0-2",
+      "pairwise_within_diagnosis_1-2"
     ],
     "stability_resamples": 10
   },
@@ -134,133 +133,20 @@
       "0-2": 0.0,
       "1-2": 0.0
     },
-    "max": 0.0,
-    "max_pair": "0-1",
-    "statistic": "normalised Kendall tau distance"
+    "statistic": "normalized Kendall distance"
   },
   "tests": {
-    "unrestricted": {
+    "pairwise_within_diagnosis_0-1": {
+      "scheme": "pairwise_within_diagnosis",
       "definition": {
-        "stratify": "none",
-        "groups": [
-          0,
-          1,
-          2
-        ],
-        "pair_index": null
-      },
-      "budget": 59,
-      "completed": 59,
-      "failed": 0,
-      "pairs": {
-        "0-1": {
-          "exceedances": 59,
-          "p": 1.0,
-          "p_bounds": [
-            1.0,
-            1.0
-          ],
-          "reject": false,
-          "threshold": 0.016666666666666666
-        },
-        "0-2": {
-          "exceedances": 59,
-          "p": 1.0,
-          "p_bounds": [
-            1.0,
-            1.0
-          ],
-          "reject": false,
-          "threshold": 0.016666666666666666
-        },
-        "1-2": {
-          "exceedances": 59,
-          "p": 1.0,
-          "p_bounds": [
-            1.0,
-            1.0
-          ],
-          "reject": false,
-          "threshold": 0.016666666666666666
-        }
-      },
-      "max": {
-        "exceedances": 59,
-        "p": 1.0,
-        "p_bounds": [
-          1.0,
-          1.0
-        ],
-        "reject": false,
-        "threshold": 0.05
-      },
-      "seconds": 11.94903436792083
-    },
-    "diagnosis": {
-      "definition": {
-        "stratify": "diagnosis",
-        "groups": [
-          0,
-          1,
-          2
-        ],
-        "pair_index": null
-      },
-      "budget": 59,
-      "completed": 59,
-      "failed": 0,
-      "pairs": {
-        "0-1": {
-          "exceedances": 59,
-          "p": 1.0,
-          "p_bounds": [
-            1.0,
-            1.0
-          ],
-          "reject": false,
-          "threshold": 0.016666666666666666
-        },
-        "0-2": {
-          "exceedances": 59,
-          "p": 1.0,
-          "p_bounds": [
-            1.0,
-            1.0
-          ],
-          "reject": false,
-          "threshold": 0.016666666666666666
-        },
-        "1-2": {
-          "exceedances": 59,
-          "p": 1.0,
-          "p_bounds": [
-            1.0,
-            1.0
-          ],
-          "reject": false,
-          "threshold": 0.016666666666666666
-        }
-      },
-      "max": {
-        "exceedances": 59,
-        "p": 1.0,
-        "p_bounds": [
-          1.0,
-          1.0
-        ],
-        "reject": false,
-        "threshold": 0.05
-      },
-      "seconds": 11.540407624328509
-    },
-    "diagnosis_pair_0-1": {
-      "definition": {
+        "scheme": "pairwise_within_diagnosis",
         "stratify": "diagnosis",
         "groups": [
           0,
           1
         ],
-        "pair_index": 0
+        "pair_index": 0,
+        "stream": "diagnosis_pair_0-1"
       },
       "budget": 59,
       "completed": 59,
@@ -273,21 +159,28 @@
             1.0,
             1.0
           ],
+          "p_adjusted": 1.0,
+          "p_adjusted_bounds": [
+            1.0,
+            1.0
+          ],
           "reject": false,
           "threshold": 0.016666666666666666
         }
       },
-      "max": null,
-      "seconds": 10.618987708818167
+      "seconds": 12.855137371923774
     },
-    "diagnosis_pair_0-2": {
+    "pairwise_within_diagnosis_0-2": {
+      "scheme": "pairwise_within_diagnosis",
       "definition": {
+        "scheme": "pairwise_within_diagnosis",
         "stratify": "diagnosis",
         "groups": [
           0,
           2
         ],
-        "pair_index": 1
+        "pair_index": 1,
+        "stream": "diagnosis_pair_0-2"
       },
       "budget": 59,
       "completed": 59,
@@ -300,21 +193,28 @@
             1.0,
             1.0
           ],
+          "p_adjusted": 1.0,
+          "p_adjusted_bounds": [
+            1.0,
+            1.0
+          ],
           "reject": false,
           "threshold": 0.016666666666666666
         }
       },
-      "max": null,
-      "seconds": 10.458299627993256
+      "seconds": 11.969406212680042
     },
-    "diagnosis_pair_1-2": {
+    "pairwise_within_diagnosis_1-2": {
+      "scheme": "pairwise_within_diagnosis",
       "definition": {
+        "scheme": "pairwise_within_diagnosis",
         "stratify": "diagnosis",
         "groups": [
           1,
           2
         ],
-        "pair_index": 2
+        "pair_index": 2,
+        "stream": "diagnosis_pair_1-2"
       },
       "budget": 59,
       "completed": 59,
@@ -327,28 +227,33 @@
             1.0,
             1.0
           ],
+          "p_adjusted": 1.0,
+          "p_adjusted_bounds": [
+            1.0,
+            1.0
+          ],
           "reject": false,
           "threshold": 0.016666666666666666
         }
       },
-      "max": null,
-      "seconds": 10.25151291443035
+      "seconds": 10.839500549249351
     }
   },
   "decisions": {
     "rule": "le",
     "alpha": 0.05,
+    "n_pairs": 3,
     "per_pair_threshold": 0.016666666666666666,
-    "convention": "p = (1 + #{perm stat >= observed}) / (B + 1); ties are exceedances; reject iff p <= threshold; decisions are exact over unfinished fits",
-    "primary": "diagnosis",
-    "localisation": "diagnosis_pair",
-    "global": "diagnosis:max",
+    "convention": "P = (1 + E) / (B + 1), E = number of relabelings with distance >= observed; a comparison is rejected when P <= alpha / n_pairs (Bonferroni); adjusted P = min(1, n_pairs * P). p and p_adjusted use the completed relabelings, (1 + E) / (completed + 1); reject and p_bounds refer to the planned B, with failed or unfinished relabelings counted as exceedances for the upper bound, and reject is None when those relabelings could still change the decision",
+    "reject": {
+      "pairwise_within_diagnosis": {
+        "0-1": false,
+        "0-2": false,
+        "1-2": false
+      }
+    },
     "reject_any_pair": {
-      "unrestricted": false,
-      "diagnosis": false,
-      "diagnosis_pair_0-1": false,
-      "diagnosis_pair_0-2": false,
-      "diagnosis_pair_1-2": false
+      "pairwise_within_diagnosis": false
     },
     "stop_when_decided": false
   },
@@ -397,7 +302,7 @@
       "MCI": 0.27,
       "AD": 0.326
     },
-    "min_reference": {
+    "min_rule": {
       "CN": 0.39428959891230453,
       "MCI": 0.26172671651937457,
       "AD": 0.3439836845683209
@@ -407,6 +312,29 @@
     "chi2_p": 5.654160160664615e-08,
     "flags": []
   },
+  "common_proportions": {
+    "CN": 0.39428959891230453,
+    "MCI": 0.26172671651937457,
+    "AD": 0.3439836845683209
+  },
+  "weights": {
+    "0": {
+      "CN": 0.6857210415866166,
+      "MCI": 1.495581237253569,
+      "AD": 1.3759347382732836
+    },
+    "1": {
+      "CN": 0.8046726508414378,
+      "MCI": 0.9347382732834805,
+      "AD": 1.495581237253569
+    },
+    "2": {
+      "CN": 1.495581237253569,
+      "MCI": 0.8858442712963447,
+      "AD": 0.7801691814951608
+    }
+  },
+  "largest_weight": 1.495581237253569,
   "effective_sample_size": {
     "0": 70.47804026855901,
     "1": 185.80874895702058,
@@ -462,33 +390,28 @@
     },
     "between_group_distance_mean": {
       "0-1": 0.04642857142857142,
-      "0-2": 0.039285714285714285,
-      "1-2": 0.04285714285714285
+      "0-2": 0.03928571428571428,
+      "1-2": 0.04285714285714286
     }
   },
   "paired_difference": {
-    "pairs": {
-      "0-1": 0.0,
-      "0-2": 0.0,
-      "1-2": 0.0
-    },
-    "max": 0.0,
-    "note": "p(diagnosis) - p(unrestricted); a large positive value marks composition-driven significance under the unrestricted reference"
+    "pairs": {},
+    "note": "P(within_diagnosis) - P(unrestricted) for each comparison"
   },
   "fits": {
-    "ok": 306,
+    "ok": 188,
     "error": 0,
     "timeout": 0
   },
   "timing": {
-    "wall_seconds": 18.72709883400239,
-    "observed_fit_seconds": 0.9932499160058796,
-    "mean_fit_seconds": 0.185824549977936,
+    "wall_seconds": 13.999849416315556,
+    "observed_fit_seconds": 0.9007093752734363,
+    "mean_fit_seconds": 0.201491774767532,
     "workers": 4
   },
   "provenance": {
-    "package_version": "concord-0.1.0",
-    "started_utc": "2026-09-13T12:42:20.039388+00:00",
+    "package_version": "concord-0.2.0",
+    "started_utc": "2026-09-26T21:10:34.511241+00:00",
     "pyebm": {
       "versions": {
         "python": "3.12.7",
@@ -499,7 +422,6 @@
         "scikit-learn": "1.9.1",
         "statsmodels": "0.15.0"
       },
-      "pyebm_path": "/Users/tianchuangao/method/concord/.venv/lib/python3.12/site-packages/pyebm",
       "source_sha256": {
         "central_ordering/generalized_mallows.py": "9c05900c77e81d9499e6f02a6d62879bb1de1fea51095834897cac2042aba431",
         "core_utilities.py": "e74650bfabea67885151142e142082feeeb944af50380db86256168ee0927972",
@@ -507,13 +429,16 @@
       },
       "wheel_sha256": "246e1bb93db4ad0ed0c701f3e241b9c7ceda112599acff1c86291abaf6cb8df4"
     },
-    "finished_utc": "2026-09-13T12:42:38.766922+00:00",
+    "finished_utc": "2026-09-26T21:10:48.511128+00:00",
     "engine_diagnostics_keys": [
       "biomarkers",
+      "common_proportions",
+      "common_proportions_rule",
       "consensus",
       "effective_sample_size",
       "engine_version",
       "event_centers_finite",
+      "group_weights",
       "invariant_engine_version",
       "mode",
       "optimizer",
@@ -525,7 +450,6 @@
       "provenance",
       "pyebm_biomarkers",
       "quality_flags",
-      "reference_composition",
       "seconds",
       "variant",
       "warnings",
@@ -545,7 +469,6 @@
         "scikit-learn": "1.9.1",
         "statsmodels": "0.15.0"
       },
-      "pyebm_path": "/Users/tianchuangao/method/concord/.venv/lib/python3.12/site-packages/pyebm",
       "source_sha256": {
         "central_ordering/generalized_mallows.py": "9c05900c77e81d9499e6f02a6d62879bb1de1fea51095834897cac2042aba431",
         "core_utilities.py": "e74650bfabea67885151142e142082feeeb944af50380db86256168ee0927972",
@@ -1052,16 +975,38 @@
     "optimizer_failures": 0,
     "warnings_count": 0,
     "warnings": [],
-    "seconds": 0.401782542001456,
-    "invariant_engine_version": "invariant-v1.0",
+    "seconds": 0.38429058296605945,
+    "invariant_engine_version": "invariant-v1.1",
     "variant": "invariant_min",
-    "reference_composition": "min",
+    "common_proportions_rule": "min",
+    "common_proportions": [
+      0.39428959891230453,
+      0.26172671651937457,
+      0.3439836845683209
+    ],
+    "group_weights": {
+      "0": [
+        0.6857210415866166,
+        1.495581237253569,
+        1.3759347382732836
+      ],
+      "1": [
+        0.8046726508414378,
+        0.9347382732834805,
+        1.495581237253569
+      ],
+      "2": [
+        1.495581237253569,
+        0.8858442712963447,
+        0.7801691814951608
+      ]
+    },
     "effective_sample_size": {
       "0": 70.47804026855901,
       "1": 185.80874895702058,
       "2": 201.85213865269682
     },
     "pooled_mixture_cached": false,
-    "pooled_mixture_seconds": 0.23056687484495342
+    "pooled_mixture_seconds": 0.21255745831876993
   }
 }

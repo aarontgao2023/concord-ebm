@@ -1,18 +1,18 @@
-"""Development-only evaluation of direct normal PDF calls in the GMM objective.
+"""Faster evaluation of pyebm's Gaussian-mixture objective (used by default).
 
-The pinned pyebm objective creates two scipy.stats.norm frozen distribution
-objects at every evaluation. This variant calls the same public norm.pdf with
-the same loc/scale instead. It preserves filtering, arithmetic order, the
-1e-100 term, group summation, parameterization and function name. No gradients,
-tolerances, bounds, optimizer or other pyebm function are changed.
+At every evaluation of the mixture log-likelihood, pyebm 2.0.3 constructs two frozen
+scipy.stats.norm distributions. calculate_likelihood_gmm below computes the same objective by
+calling scipy.stats.norm.pdf with the same location and scale. Removal of missing values, the
+order of the arithmetic, the 1e-100 term, the sum over groups, the parameterization and the
+function name are unchanged; gradients, tolerances, bounds, the optimizer and every other pyebm
+function are untouched. concord.compare(fast_likelihood=False) uses the unmodified objective.
 
-The context is opt-in, process-local and always restores the original objective.
-It must pass independent numerical/trajectory and HPC bridge checks before a
-new named confirmation snapshot uses it. Existing snapshots remain unchanged.
+The replacement is process-local and the original objective is always restored.
 
-Objective adapted from pyebm 2.0.3 gaussian_mixture_model.py, copyright Erasmus
-MC Rotterdam and contributors; original and derivative objective are licensed
-under GNU GPL version 3. SPDX-License-Identifier: GPL-3.0-only
+Objective adapted from pyebm 2.0.3 gaussian_mixture_model.py, copyright Erasmus MC Rotterdam and
+contributors, licensed under the GNU General Public License version 3; the adapted objective is
+licensed under the same terms.
+SPDX-License-Identifier: GPL-3.0-only
 """
 from __future__ import annotations
 
@@ -63,8 +63,8 @@ def calculate_likelihood_gmm(param, data, Groups, GroupValues, Mixing):
 def fast_likelihood_context(enabled: bool = True):
     """Temporarily replace only the verified upstream GMM objective.
 
-    Uses the existing reentrant engine lock, so nesting with either standard or
-    paired engines is safe. The objective's __name__ is preserved for diagnostics.
+    Uses the reentrant engine lock, so nesting with any DEBM fit of this package
+    is safe. The objective's __name__ is preserved for diagnostics.
     """
     if not enabled:
         yield {"enabled": False, "version": FAST_LIKELIHOOD_VERSION}

@@ -1,7 +1,7 @@
-"""Engine checks (audited co-init DEBM engines); run with pytest.
+"""Checks of the DEBM fits and the continued consensus search; run with pytest.
 
-Requires the pinned pyebm wheel and its scientific dependencies. Tests exercise
-the actual upstream objective and a small complete DEBM fit, not a large study.
+Requires the pinned pyebm wheel and its scientific dependencies. The tests use
+pyebm's own ranking loss and a small complete DEBM fit on synthetic data.
 """
 from __future__ import annotations
 
@@ -80,7 +80,7 @@ class EngineTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             map_orderings([[0, 1]], ["b0", "b1"], ["b0", "extra"], 1)
 
-    def test_standard_fit_matches_upstream_and_repair_is_isolated(self):
+    def test_separate_fit_matches_pyebm_and_continued_search_is_isolated(self):
         from pyebm import debm
         frame = small_dataset()
         direct, _, _ = debm.fit(frame, Factors=[], Labels=["CN", "MCI", "AD"],
@@ -95,7 +95,7 @@ class EngineTests(unittest.TestCase):
         for record in repaired.diagnostics["consensus"]:
             self.assertTrue(record["local_optimal"])
             self.assertLessEqual(record["final_score"], record["initial_score"])
-        # A repaired call cannot leave a patched optimizer or consensus behind.
+        # A continued-search call cannot leave a patched optimizer or consensus behind.
         original_again = fit_orderings(frame, EngineConfig(expected_events=4))
         self.assertTrue(original_again.ok, original_again.diagnostics)
         np.testing.assert_array_equal(original_again.orderings, original.orderings)

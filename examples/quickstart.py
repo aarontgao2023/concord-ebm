@@ -1,24 +1,34 @@
-"""CONCORD quick start on a small synthetic cohort.
+"""CONCORD quick start on a small synthetic dataset.
 
     python examples/quickstart.py            # about a minute on 4 cores at B=59
 
-Three groups share one true event ordering but differ in their mix of CN / MCI / AD subjects, which is
-exactly the situation in which per-group EBM orderings drift apart. Replace `df` by your own data frame
-(columns PTID, Diagnosis, a group column, biomarker columns). The `if __name__ == "__main__"` guard is
-required whenever workers > 1: the worker processes are spawned and re-import this file.
+Three groups share one true event ordering but differ in their proportions of CN, MCI and AD
+participants, the situation in which orderings fitted separately to each group drift apart.
+Replace `df` by your own data frame (one row per participant: PTID, Diagnosis, a group column and
+the biomarker columns). The `if __name__ == "__main__":` guard is required whenever workers > 1:
+the worker processes are spawned and re-import this file.
 
-The ADNI-shaped simulator and the pre-registered simulation protocols of the paper live in the companion
-repository https://github.com/aarontgao2023/concord-ebm-paper.
+With three groups, compare() tests each pair of groups by pairwise within-diagnosis permutation
+by default (with two groups, by within-diagnosis permutation); schemes=concord.SCHEMES adds
+unrestricted permutation and within-diagnosis permutation of all groups. B=59 keeps the example
+fast; use the default B=599 for real analyses. The code for the simulations, the ADNI and NACC
+analyses, and the figures and tables of the paper is in
+https://github.com/aarontgao2023/concord-ebm-paper.
 """
+import json
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 
 import concord
 
+OUTPUT = Path(__file__).resolve().parent / "output_quickstart.json"
+
 
 def synthetic_cohort(seed=0, events=8, composition=((0.75, 0.10, 0.15), (0.45, 0.30, 0.25), (0.20, 0.35, 0.45)),
                      sizes=(80, 200, 220), sigma=0.7):
-    """Same true ordering (event 0 first) in every group; stage drawn from the group's composition."""
+    """Same true ordering (event 0 first) in every group; diagnosis drawn from the group's proportions."""
     rng = np.random.default_rng(seed)
     rows = []
     for g, (mix, n) in enumerate(zip(composition, sizes)):
@@ -32,13 +42,28 @@ def synthetic_cohort(seed=0, events=8, composition=((0.75, 0.10, 0.15), (0.45, 0
     return pd.DataFrame(rows)
 
 
+def _drop_local_paths(value):
+    """Remove the installation path of pyebm, so that the saved example output is portable."""
+    if isinstance(value, dict):
+        return {k: _drop_local_paths(v) for k, v in value.items() if k != "pyebm_path"}
+    if isinstance(value, list):
+        return [_drop_local_paths(v) for v in value]
+    return value
+
+
 def main():
     df = synthetic_cohort()
-    print(pd.crosstab(df["group"], df["Diagnosis"]))
-    result = concord.compare(df, group_column="group", labels=("CN", "MCI", "AD"), estimator="invariant_min",
+    print(pd.crosstab(df["group"], df["Diagnosis"])[["CN", "MCI", "AD"]])
+
+    # Common proportions by the minimum rule (the default of compare()); pass a result like this
+    # as common_proportions=... to hold the proportions fixed, e.g. across several datasets.
+    print("common proportions (minimum rule):", concord.common_proportions(df, group_column="group"))
+
+    # default schemes: one pairwise within-diagnosis permutation test per pair of groups
+    result = concord.compare(df, group_column="group", labels=("CN", "MCI", "AD"), estimator="concord",
                              B=59, stability_resamples=10, seed=1, workers=4)
     print(result.summary())
-    result.to_json("examples/output_quickstart.json")
+    OUTPUT.write_text(json.dumps(_drop_local_paths(result.to_dict()), indent=2, allow_nan=True) + "\n")
 
 
 if __name__ == "__main__":

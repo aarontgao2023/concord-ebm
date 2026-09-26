@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "concord-ebm"
 dynamic = ["version"]
-description = "CONCORD: composition-invariant comparison of event-based model (EBM) orderings between groups"
+description = "CONCORD (composition-normalized consensus for ordering comparison): compares event-based model orderings between patient groups at common diagnostic proportions"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "GPL-3.0-or-later"}
@@ -30,7 +30,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-saebm = ["pysaebm"]
+saebm = ["pysaebm==7.7.7"]
 dev = ["pytest>=7", "build", "twine"]
 
 [project.scripts]

@@ -16,3 +16,14 @@ def small_dataset():
                              "APOE": group,
                              **{f"b{i}": float(value) for i, value in enumerate(values)}})
     return pd.DataFrame(rows)
+
+
+def compare_in_worker(workers):
+    """Run concord.compare inside a worker process (used by the worker-guard test)."""
+    import concord
+    try:
+        result = concord.compare(small_dataset(), B=0, stability_resamples=0, schemes=("within_diagnosis",),
+                                 workers=workers, verbose=False)
+    except RuntimeError as exc:
+        return f"RuntimeError: {exc}"
+    return result.status
